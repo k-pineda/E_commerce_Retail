@@ -8,40 +8,53 @@ class Product extends Model {}
 
 // set up fields and rules for Product model
 Product.init(
-  {
+{
     // define columns
-    id: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    product_name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    price: {
-      type: DataTypes.DECIMAL,
-      allowNull: false,
-      default: 0,
-    },
-    // TODO: Add a comment describing what this column holds information for 
-    category_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        // TODO: Add a comment describing where `reader` comes from
-        model: 'product',
-        key: 'id',
-      },
+  product_name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true,
+  },
+  price: { 
+    type: DataTypes.DECIMAL(10,2),
+    allowNull: false,
+    validate: {
+      isDecimal: true,
+    }
+  },
+  stock: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 10,
+    validate: {
+      isNumeric: true,
+    }
+  },
+  category_id: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    // References the category model's id
+    references: {
+      model: "category",
+      key: "id",
     },
   },
-  {
-    sequelize,
-    timestamps: false,
-    freezeTableName: true,
-    underscored: true,
-    modelName: 'product',
-  }
+},
+
+{
+   // Link to database connection
+  sequelize,
+  // Set to false to remove 'created_at', and 'updated_at'
+  timestamps: false,
+  freezeTableName: true,
+  underscored: true,
+  modelName: 'product',
+}
 );
 
 module.exports = Product;
