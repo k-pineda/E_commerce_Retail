@@ -8,13 +8,17 @@ router.get('/', async (req, res) => {
   // find all products
   // be sure to include its associated Category and Tag data
   try {
-    const allProduct = await Product.findAll({
-      include: [Category, {
-        model: Tag,
+    const allProducts = await Product.findAll({
+      include: [
+        {model:Category,
+        attributes: ['id', 'category_name'],
+        }, 
+        {model: Tag, attributes: ['id', 'tag_name'],
         through: ProductTag
-      }],
+        }
+      ],
     });
-    res.status(200).json(allProduct);
+    res.status(200).json(allProducts);
   } catch (error) {
     console.log(error);
     res.status(500).json(error);
@@ -26,10 +30,22 @@ router.get('/:id', async (req, res) => {
   // find a single product by its `id`
   // be sure to include its associated Category and Tag data
   try {
-    const product = await Product.findByPk(req.params.id, {
-      include: [{model: Category}, {model: Tag}],
+    const product = await Product.findOne({
+      where: {id: req.params.id}, 
+      include: [
+        {model: Category,
+        attributes: ['id', 'category_name'],
+        }, 
+        {model: Tag,
+        attributes: ['id', 'tag_name'], 
+        through: ProductTag}
+      ],
     });
-    res.status(200).json(product);
+      if (!product) {
+        res.status(404).json({ message: 'Product not found' });
+        return
+      }
+      res.status(200).json(product);
   } catch (error) {
     console.log(error);
       res.status(500).json(error)
@@ -106,7 +122,7 @@ router.put('/:id', (req, res) => {
     })
     .then((updatedProductTags) => res.json(updatedProductTags))
     .catch((err) => {
-      // console.log(err);
+      console.log(err);
       res.status(400).json(err);
     });
 });
@@ -114,14 +130,29 @@ router.put('/:id', (req, res) => {
 router.delete('/:id', async (req, res) => {
   // delete one product by its `id` value
   try {
-    const deletedProduct= await Product.destroy ({
+    const productId = req.params.id;
+    // Check if the product exists
+    const product = await Product.findByPk(productId);
+    if (!product) {
+      res.status(404).json({ message: 'Product not found' });
+      return;
+    }
+    // Delete the product
+    await Product.destroy({
       where: {
-        id: req.params.id,
-      }
-    })
-    res.json(deletedProduct);
-  } catch (error) {
-    res.json(error)
+        id: productId,
+      },
+    });
+    // Delete associated ProductTag entries
+    await ProductTag.destroy({
+      where: {
+        product_id: productId,
+      },
+    });
+    res.status(200).json({ message: 'Product deleted successfully' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json(err);
   }
 });
 
