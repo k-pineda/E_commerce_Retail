@@ -51,4 +51,8 @@ This project provides API routes to perform all CRUD (Create, Read, Update, Dele
 
 For a detailed walkthrough of setting up and using this backend, please refer to the provided video walkthrough.
 
+
+https://github.com/k-pineda/E_commerce_Retail/assets/128410226/490fb29e-3778-4d7f-9aa6-8686f1a970a5
+
+
 Happy coding!
