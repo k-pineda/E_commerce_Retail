@@ -109,7 +109,7 @@ router.put('/:id', (req, res) => {
                 tag_id,
               };
             });
-            console.logged(req.body.tagIds ) 
+            // console.logged(req.body.tagIds ) 
           // figure out which ones to remove
           const productTagsToRemove = productTags
             .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
